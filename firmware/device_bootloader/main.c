@@ -58,7 +58,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // Configuration Bits
-#if defined(__PIC24FJ256GB206__)
+#if defined(__PIC24FJ256GB206__) ||  defined(__PIC24FJ256DA206__)
   _CONFIG1(FWDTEN_OFF & ICS_PGx2 & GWRP_OFF & GCP_OFF & JTAGEN_OFF)
   _CONFIG2(POSCMOD_NONE & IOL1WAY_ON & OSCIOFNC_ON & FCKSM_CSDCMD & FNOSC_FRCPLL & PLL96MHZ_ON & PLLDIV_NODIV & IESO_OFF)
   _CONFIG3(WPDIS_WPEN & WPFP_WPFP19 & WPCFG_WPCFGEN & WPEND_WPSTARTMEM & SOSCSEL_EC)
@@ -140,7 +140,8 @@ static void OscCalibrate() {
   int led_counter = 0;
   while (USBGetDeviceState() != POWERED_STATE) {
     USBTasks();
-    if ((led_counter++ & 0x3FFF) == 0) led_toggle();
+    if ((led_counter++ & 0x3FFF) == 0)
+        led_toggle();
   }
   led_off();
 
@@ -233,15 +234,23 @@ int main() {
     log_printf("Erasing config.");
     EraseConfig();
   }
-  OscCalibrateCached();
+
+  // this may cause issues, comment out for now.
+  //OscCalibrateCached();
   Blink(5);
   USBInitialize();
 
   while (1) {
+      unsigned short led_counter =0;
     // Wait for connection
     while (!(USBGetDeviceState() == CONFIGURED_STATE
-      && CDCIsDtePresent())) USBTasks();
+      && CDCIsDtePresent())) {
+        USBTasks();
+         if ((led_counter++ & 0xFFFF) == 0)
+        led_toggle();
+    }
 
+      led_off();
     log_printf("Connected!");
     BootProtocolInit();
 

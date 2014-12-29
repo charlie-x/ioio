@@ -118,15 +118,15 @@
 #define led_off()        led  = 1;
 #define led_toggle()     led  = !led;
 #elif BOARD_VER >= BOARD_SPRK0020
-#define led_init()       { _ODC12 = 1; _LATC12 = 1; _TRISC12 = 0; }
-#define led_read()       _RC12
-#define led              _LATC12
+#define led_init()       { _ODB7 = 1; _LATB7 = 1; _TRISB7 = 0; }
+#define led_read()       _RB7
+#define led              _LATB7
 #define led_on()         led  = 0;
 #define led_off()        led  = 1;
 #define led_toggle()     led  = !led;
 
-#define pin1_pullup   _CN17PUE
-#define pin1_read()   _RF4
+#define pin1_pullup   _CN24PUE
+#define pin1_read()   _RB6
 
 #else
   #error Unknown board

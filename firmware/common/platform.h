@@ -124,9 +124,9 @@
 #define led_on()   do { _LATF3 = 0; } while (0)
 #define led_off()  do { _LATF3 = 1; } while (0)
 #elif HARDWARE == HARDWARE_IOIO0004
-#define led_init() do { _ODC12 = 1; _LATC12 = 1; _TRISC12 = 0; } while (0)
-#define led_on()   do { _LATC12 = 0; } while (0)
-#define led_off()  do { _LATC12 = 1; } while (0)
+#define led_init() do { _ODG7 = 1; _LATG7 = 1; _TRISG7 = 0; } while (0)
+#define led_on()   do { _LATG7 = 0; } while (0)
+#define led_off()  do { _LATG7 = 1; } while (0)
 #else
   #error Unknown hardware
 #endif
