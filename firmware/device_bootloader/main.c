@@ -125,9 +125,12 @@ uint32_t MeasureSOF() {
 // Then it will wait for 32 SOF's for the tuning process (will hang if they do
 // not arrive!). Then, if will disconnect from the USB bus and wait 2 seconds.
 // Upon exit, the _TUN register will hold the correct value.
+
+// the L1 Board uses an external XTAL, so we can look at this later.
 static void OscCalibrate() {
   int i;
 
+#if !(BOARD_VER >= BOARD_L1DEMOBOARD)
   led_init();
   USBInitialize();
 
@@ -135,12 +138,11 @@ static void OscCalibrate() {
   T2CON = 0x0008;
   PR2 = PR3 = 0xFFFF;
   T2CON = 0x8008;
-
   // Wait for a USB connection. Blink meanwhile.
   int led_counter = 0;
   while (USBGetDeviceState() != POWERED_STATE) {
     USBTasks();
-    if ((led_counter++ & 0x3FFF) == 0)
+    if ((led_counter++ & 0x1FFF) == 0)
         led_toggle();
   }
   led_off();
@@ -174,6 +176,7 @@ static void OscCalibrate() {
   // Detach, wait.
   USBShutdown();
   __delay_ms(2000);
+#endif
 }
 
 // Tune the oscillator by reading the value from configuration, or otherwise
@@ -190,6 +193,17 @@ void OscCalibrateCached() {
   }
 }
 
+#if BOARD_VER >= BOARD_L1DEMOBOARD
+static bool IsPin2Grounded() {
+  bool result;  
+  pin2_init();
+    pin2_pullup = 1;
+  result = pin2_read();
+  pin2_pullup = 0;
+  return result;
+}
+#endif
+
 static bool IsPin1Grounded() {
   bool result;
   pin1_pullup = 1;
@@ -204,22 +218,30 @@ static bool ShouldEnterBootloader() {
   _IOPUWR = 0;
   return result;
 #else
-  return !led_read();
+#if BOARD_VER >= BOARD_L1DEMOBOARD
+  return !IsPin2Grounded();
+#else
+  return !IsPin1Grounded();
+#endif
 #endif
 }
 
 int main() {
+
   log_init();
 
+led_init();
+
   // If bootloader mode not requested, go immediately to app.
-  if (!ShouldEnterBootloader()) {
+  if (!ShouldEnterBootloader())
+  {
     OscCalibrateCached();
     log_printf("Running app...");
     __asm__("goto __APP_RESET");
   }
 
   // We need to enter bootloader mode, wait for the boot pin to be released.
-  while (!led_read());
+ // while (!IsPin2Grounded());
 
   // Now we can start!
   led_init();
@@ -236,7 +258,7 @@ int main() {
   }
 
   // this may cause issues, comment out for now.
-  //OscCalibrateCached();
+  OscCalibrateCached();
   Blink(5);
   USBInitialize();
 
@@ -247,7 +269,7 @@ int main() {
       && CDCIsDtePresent())) {
         USBTasks();
          if ((led_counter++ & 0xFFFF) == 0)
-        led_toggle();
+            led_toggle();
     }
 
       led_off();

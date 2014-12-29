@@ -54,6 +54,7 @@
 #define PLATFORM_IOIO0023 PLATFORM_IOIO_BASE + 23
 #define PLATFORM_IOIO0030 PLATFORM_IOIO_BASE + 30
 // add more platforms here!
+#define PLATFORM_IOIO0031 PLATFORM_IOIO_BASE + 31
 
 #define HARDWARE_IOIO_BASE 1000  // base hardware interface version number for 'official' IOIO platforms
 #define HARDWARE_IOIO0000 HARDWARE_IOIO_BASE + 0
@@ -77,6 +78,8 @@
 #define HARDWARE HARDWARE_IOIO0003
 #elif PLATFORM == PLATFORM_IOIO0030
 #define HARDWARE HARDWARE_IOIO0004
+#elif PLATFORM == PLATFORM_IOIO0031
+#define HARDWARE HARDWARE_IOIO0005
 #else
 #error Unknown hardware for PLATFORM
 #endif
@@ -103,6 +106,10 @@
   #ifndef __PIC24FJ256GB206__
     #error Platform and MCU mismatch - expecting PIC24FJ256GB206
   #endif
+#elif HARDWARE == HARDWARE_IOIO0005
+  #ifndef __PIC24FJ256DA206__
+    #error Platform and MCU mismatch - expecting PIC24FJ256GB206
+  #endif
 #else
   #error Unknown platform
 #endif
@@ -113,6 +120,8 @@
 #elif HARDWARE >= HARDWARE_IOIO0001 && HARDWARE <= HARDWARE_IOIO0003
   #define NUM_PINS 49
 #elif HARDWARE == HARDWARE_IOIO0004
+  #define NUM_PINS 47
+#elif HARDWARE == HARDWARE_IOIO0005
   #define NUM_PINS 47
 #else
   #error Unknown hardware
@@ -127,6 +136,11 @@
 #define led_init() do { _ODG7 = 1; _LATG7 = 1; _TRISG7 = 0; } while (0)
 #define led_on()   do { _LATG7 = 0; } while (0)
 #define led_off()  do { _LATG7 = 1; } while (0)
+#elif HARDWARE == HARDWARE_IOIO0005
+#define led_init() do {  _ODB7 = 1; _LATB7 = 1; _TRISB7 = 0;} while (0)
+#define led_on()   do { _LATB7 = 0; } while (0)
+#define led_off()  do { _LATB7 = 1; } while (0)
+
 #else
   #error Unknown hardware
 #endif

@@ -8,11 +8,13 @@
 
 int main() {
   led_init();
-  while (1) {
+
+  for(;;){
     led_on();
     DelayMs(500);
     led_off();
     DelayMs(500);
   }
+
   return 0;
 }

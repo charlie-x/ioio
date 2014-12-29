@@ -42,6 +42,8 @@
 #define BOARD_SPRK0016 BOARD_SPRK_BASE + 16
 #define BOARD_SPRK0020 BOARD_SPRK_BASE + 20
 
+#define BOARD_L1DEMOBOARD BOARD_SPRK_BASE + 21
+
 #define BOARD_MINT_BASE 2000  // base number for IOIOMint boards
 #define BOARD_MINT0010 BOARD_MINT_BASE + 10
 
@@ -66,6 +68,10 @@
   #endif
 #elif BOARD_VER == BOARD_SPRK0020
   #ifndef __PIC24FJ256GB206__
+    #error Board and MCU mismatch - expecting PIC24FJ256GB206
+  #endif
+#elif BOARD_VER == BOARD_L1DEMOBOARD
+  #ifndef __PIC24FJ256DA206__
     #error Board and MCU mismatch - expecting PIC24FJ256GB206
   #endif
 #elif BOARD_VER == BOARD_MINT0010
@@ -95,6 +101,8 @@
   #define HW_IMPL_VER "SPRK0016"
 #elif BOARD_VER == BOARD_SPRK0020
   #define HW_IMPL_VER "SPRK0020"
+#elif BOARD_VER == BOARD_L1DEMOBOARD
+  #define HW_IMPL_VER "L1DM0021"
 #elif BOARD_VER == BOARD_MINT0010
   #define HW_IMPL_VER "MINT0010"
 #else
@@ -111,7 +119,25 @@
 #endif
 
 // LED
-#if BOARD_VER >= BOARD_SPRK0010 && BOARD_VER < BOARD_SPRK0020
+#if BOARD_VER >= BOARD_L1DEMOBOARD
+
+#define led_init()       { _ODB7 = 1; _LATB7 = 1; _TRISB7 = 0; }
+#define led_read()       _RB7
+#define led              _LATB7
+#define led_on()         led  = 0;
+#define led_off()        led  = 1;
+#define led_toggle()     led  = !led;
+
+// RP18
+#define pin1_pullup   _CN7PUE
+#define pin1_read()   _RB5
+
+// RP6
+#define pin2_init()   { ANSB  = 0; ; _TRISB6 = 1; }
+#define pin2_pullup   _CN6PUE
+#define pin2_read()   _RB6
+
+#elif BOARD_VER >= BOARD_SPRK0010 && BOARD_VER < BOARD_SPRK0020
 #define led_init()       { _ODF3 = 1; _LATF3 = 1; _TRISF3 = 0;}
 #define led              _LATF3
 #define led_on()         led  = 0;
@@ -127,6 +153,10 @@
 
 #define pin1_pullup   _CN24PUE
 #define pin1_read()   _RB6
+
+#define pin2_init()       
+#define pin2_pullup   _CN7PUE
+#define pin2_read()   _RB5
 
 #else
   #error Unknown board

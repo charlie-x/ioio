@@ -84,8 +84,8 @@
         <targetHeader></targetHeader>
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
-        <languageToolchain>C30</languageToolchain>
-        <languageToolchainVersion></languageToolchainVersion>
+        <languageToolchain>XC16</languageToolchain>
+        <languageToolchainVersion>1.23</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
@@ -133,6 +133,9 @@
         <property key="preprocessor-macros" value="NDEBUG;USB_SUPPORT_HOST"/>
         <property key="scalar-model" value="default"/>
       </C30>
+      <C30-AR>
+        <property key="additional-options-chop-files" value="false"/>
+      </C30-AR>
       <C30-AS>
       </C30-AS>
       <C30-LD>
